@@ -26,6 +26,8 @@ before_script:
   # CMake
   - >
     if [ "$BUILD_TOOL" = "CMake" ]; then
+      # Install Doxygen
+      brew update && brew install doxygen
       mkdir build
       cd build
       cmake ..
@@ -34,11 +36,13 @@ script:
   - >
     if [ "$BUILD_TOOL" = "CMake" ]; then
       make;
+      make doc;
     fi;
   - >
     if [ "$BUILD_TOOL" = "Xcode" ]; then
       xcodebuild -configuration Release -target ESP -project "Xcode/ESP/ESP.xcodeproj"
     fi
+
 cache:
   directories:
     - third-party/openFrameworks/libs

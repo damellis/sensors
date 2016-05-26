@@ -140,7 +140,7 @@ find_package(Doxygen)
 if(DOXYGEN_FOUND)
   add_custom_target(doc
     ${DOXYGEN_EXECUTABLE} Doxyfile
-    working_directory ${CMAKE_CURRENT_SOURCE_DIR}/Xcode/ESP
-    comment "Generating API documentation with Doxygen" VERBATIM
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Xcode/ESP
+    COMMENT "Generating API documentation with Doxygen" VERBATIM
     )
 endif(DOXYGEN_FOUND)
