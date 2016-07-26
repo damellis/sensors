@@ -264,33 +264,33 @@ void SerialStream::readSerial() {
 
         int local_buffer_size = kBufferSize_;
         int bytesRequired = kBufferSize_;
-		uint8_t *bytes = new uint8_t[bytesRequired];
+        uint8_t *bytes = new uint8_t[bytesRequired];
         int bytesRemaining = bytesRequired;
-		while (bytesRemaining > 0) {
-			// check for data
-			if (serial_->available() > 0) {
-				// try to read - note offset into the bytes[] array, this is so
-				// that we don't overwrite the bytes we already have
-				int bytesArrayOffset = bytesRequired - bytesRemaining;
-				int result = serial_->readBytes(&bytes[bytesArrayOffset],
-					bytesRemaining);
+        while (bytesRemaining > 0) {
+            // check for data
+            if (serial_->available() > 0) {
+                // try to read - note offset into the bytes[] array, this is so
+                // that we don't overwrite the bytes we already have
+                int bytesArrayOffset = bytesRequired - bytesRemaining;
+                int result = serial_->readBytes(&bytes[bytesArrayOffset],
+                    bytesRemaining);
 
-				// check for error code
-				if (result == OF_SERIAL_ERROR) {
-					// something bad happened
-					ofLog(OF_LOG_ERROR) << "Error reading from serial";
-					break;
-				}
-				else if (result == OF_SERIAL_NO_DATA) {
-					// nothing was read, try again
-				}
-				else {
-					// we read some data!
-					bytesRemaining -= result;
-				}
-			}
-		}
-		delete[] bytes;
+                // check for error code
+                if (result == OF_SERIAL_ERROR) {
+                    // something bad happened
+                    ofLog(OF_LOG_ERROR) << "Error reading from serial";
+                    break;
+                }
+                else if (result == OF_SERIAL_NO_DATA) {
+                    // nothing was read, try again
+                }
+                else {
+                    // we read some data!
+                    bytesRemaining -= result;
+                }
+            }
+        }
+        delete[] bytes;
         GRT::MatrixDouble data(local_buffer_size, 1);
         for (int i = 0; i < local_buffer_size; i++) {
             int b = bytes[i];
