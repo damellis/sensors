@@ -1,4 +1,4 @@
-#include "IStream.h"
+#include "istream.h"
 #include "ofApp.h"
 
 #include <chrono>         // std::chrono::milliseconds
