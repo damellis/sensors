@@ -3,8 +3,8 @@
 #include "istream.h"
 #include "ostream.h"
 
-class IOStream : public IStream, public OStream {};
-class IOStreamVector : public IStream, public OStreamVector {};
+class IOStream : public InputStream, public OStream {};
+class IOStreamVector : public InputStream, public OStreamVector {};
 
 /**
  @brief Input stream for reading ASCII data from a (USB) serial port.

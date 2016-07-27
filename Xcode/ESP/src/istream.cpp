@@ -4,7 +4,7 @@
 #include <chrono>         // std::chrono::milliseconds
 #include <thread>         // std::this_thread::sleep_for
 
-void useInputStream(IStream &stream) {
+void useInputStream(InputStream &stream) {
     ((ofApp *) ofGetAppPtr())->useIStream(stream);
 }
 
@@ -12,9 +12,9 @@ void usePipeline(GRT::GestureRecognitionPipeline &pipeline) {
     ((ofApp *) ofGetAppPtr())->usePipeline(pipeline);
 }
 
-IStream::IStream() : data_ready_callback_(nullptr) {}
+InputStream::InputStream() : data_ready_callback_(nullptr) {}
 
-vector<double> IStream::normalize(vector<double> input) {
+vector<double> InputStream::normalize(vector<double> input) {
     if (vectorNormalizer_ != nullptr) {
         return vectorNormalizer_(input);
     } else if (normalizer_ != nullptr) {
@@ -26,18 +26,18 @@ vector<double> IStream::normalize(vector<double> input) {
     }
 }
 
-void IStream::setLabelsForAllDimensions(const vector<string> labels) {
-    istream_labels_ = labels;
+void InputStream::setLabelsForAllDimensions(const vector<string> labels) {
+    InputStream_labels_ = labels;
 }
 
-void IStream::setLabelsForAllDimensions(std::initializer_list<string> list) {
+void InputStream::setLabelsForAllDimensions(std::initializer_list<string> list) {
     if (list.size() != getNumOutputDimensions()) { return; }
     vector<string> labels(list);
-    istream_labels_ = labels;
+    InputStream_labels_ = labels;
 }
 
-const vector<string>& IStream::getLabels() const {
-    return istream_labels_;
+const vector<string>& InputStream::getLabels() const {
+    return InputStream_labels_;
 }
 
 AudioStream::AudioStream(uint32_t downsample_rate)
@@ -264,7 +264,7 @@ void SerialStream::readSerial() {
 
         int local_buffer_size = kBufferSize_;
         int bytesRequired = kBufferSize_;
-        unsigned char bytes[bytesRequired];
+        uint8_t *bytes = new uint8_t[bytesRequired];
         int bytesRemaining = bytesRequired;
         while (bytesRemaining > 0) {
             // check for data
@@ -273,21 +273,24 @@ void SerialStream::readSerial() {
                 // that we don't overwrite the bytes we already have
                 int bytesArrayOffset = bytesRequired - bytesRemaining;
                 int result = serial_->readBytes(&bytes[bytesArrayOffset],
-                                                bytesRemaining);
+                    bytesRemaining);
 
                 // check for error code
                 if (result == OF_SERIAL_ERROR) {
                     // something bad happened
                     ofLog(OF_LOG_ERROR) << "Error reading from serial";
                     break;
-                } else if (result == OF_SERIAL_NO_DATA) {
+                }
+                else if (result == OF_SERIAL_NO_DATA) {
                     // nothing was read, try again
-                } else {
+                }
+                else {
                     // we read some data!
                     bytesRemaining -= result;
                 }
             }
         }
+        delete[] bytes;
         GRT::MatrixDouble data(local_buffer_size, 1);
         for (int i = 0; i < local_buffer_size; i++) {
             int b = bytes[i];

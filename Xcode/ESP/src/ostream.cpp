@@ -1,6 +1,16 @@
 #include "ofApp.h"
 #include "ostream.h"
 
+#ifdef TARGET_WIN32
+#define _WINSOCKAPI_
+#define WIN32_LEAN_AND_MEAN
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#include <Windows.h>
+#endif
+
+#include "ofxTCPClient.h"
+
 #if __APPLE__
 #include <ApplicationServices/ApplicationServices.h>
 #endif
@@ -86,8 +96,21 @@ void MacOSMouseOStream::doubleClick(pair<uint32_t, uint32_t> mouse, int clickCou
 #endif
 }
 
+bool TcpOStream::start() {
+	if (client_ == nullptr) {
+		client_ = new ofxTCPClient();
+	}
+	has_started_ = client_->setup(server_, port_);
+	client_->setMessageDelimiter("\n");
+	return has_started_;
+}
+
 void TcpOStream::sendString(const string& tosend) {
-    if (client_.isConnected()) {
-        client_.send(tosend);
+	if (client_->isConnected()) {
+		client_->send(tosend);
+	}
+	if (client_ != nullptr) {
+		delete client_;
+		client_ = nullptr;
     }
 }

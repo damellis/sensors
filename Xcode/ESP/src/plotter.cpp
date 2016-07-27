@@ -184,3 +184,65 @@ bool Plotter::clearData() {
     data_.clear();
     return true;
 }
+
+void Plotter::onRangeSelected(const onRangeSelectedCallback& cb, void* data) {
+    range_selected_callback_ = cb;
+    callback_data_ = data;
+    ofAddListener(ofEvents().mousePressed, this, &Plotter::startSelection);
+    ofAddListener(ofEvents().mouseDragged, this, &Plotter::duringSelection);
+    ofAddListener(ofEvents().mouseReleased, this, &Plotter::endSelection);
+}
+
+std::pair<uint32_t, uint32_t> Plotter::getSelection() {
+    return std::make_pair(x_start_ / x_step_, x_end_ / x_step_);
+}
+
+
+bool Plotter::contains(uint32_t x, uint32_t y) {
+    if (x_ <= x && x <= x_ + w_ && y_ <= y && y <= y_ + h_) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void Plotter::normalize() {
+    pair<uint32_t, uint32_t> sel = std::minmax(x_click_, x_release_);
+    x_start_ = sel.first;
+    x_end_ = sel.second;
+}
+
+void Plotter::startSelection(ofMouseEventArgs& arg) {
+    // Only tracks if point is inside and data_ has rows.
+    if (contains(arg.x, arg.y) && data_.getNumRows() > 0) {
+        x_click_ = arg.x - x_;
+        is_tracking_mouse_ = true;
+    }
+}
+
+void Plotter::duringSelection(ofMouseEventArgs& arg) {
+    if (is_tracking_mouse_) {
+        if (contains(arg.x, arg.y)) {
+            x_release_ = arg.x - x_;
+            normalize();
+        }
+    }
+}
+
+void Plotter::endSelection(ofMouseEventArgs& arg) {
+    if (is_tracking_mouse_) {
+        if (contains(arg.x, arg.y)) {
+            x_release_ = arg.x - x_;
+            normalize();
+        }
+
+        if (range_selected_callback_ != nullptr) {
+            CallbackArgs args;
+            args.start = x_start_;
+            args.end = x_end_;
+            args.data = callback_data_;
+            range_selected_callback_(args);
+        }
+    }
+    is_tracking_mouse_ = false;
+}

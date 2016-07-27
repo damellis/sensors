@@ -9,7 +9,6 @@
 // of System
 #include "ofMain.h"
 #include "ofxDatGui.h"
-#include "ofxGui.h"
 #include "ofxGrt.h"
 
 // custom
@@ -64,7 +63,7 @@ class ofApp : public ofBaseApp, public GRT::Observer<GRT::ErrorLogMessage> {
 
     void useCalibrator(Calibrator &calibrator);
     void usePipeline(GRT::GestureRecognitionPipeline &pipeline);
-    void useIStream(IStream &stream);
+    void useIStream(InputStream &stream);
     void useOStream(OStream &stream);
     void useOStream(OStreamVector &stream);
     void useTrainingSampleChecker(TrainingSampleChecker checker);
@@ -73,7 +72,7 @@ class ofApp : public ofBaseApp, public GRT::Observer<GRT::ErrorLogMessage> {
 
     friend void useCalibrator(Calibrator &calibrator);
     friend void usePipeline(GRT::GestureRecognitionPipeline &pipeline);
-    friend void useInputStream(IStream &stream);
+    friend void useInputStream(InputStream &stream);
     friend void useOutputStream(OStream &stream);
     friend void useOutputStream(OStreamVector &stream);
     friend void useStream(IOStream &stream);
@@ -100,7 +99,7 @@ class ofApp : public ofBaseApp, public GRT::Observer<GRT::ErrorLogMessage> {
     TrainingSampleChecker training_sample_checker_ = 0;
 
     // Input stream, a callback should be registered upon data arrival
-    IStream *istream_;
+    InputStream *istream_;
     // Callback used for input data stream (istream_)
     void onDataIn(GRT::MatrixDouble in);
 

@@ -12,6 +12,8 @@
  *
  */
 #pragma once
+#ifndef OSTREAM_H_
+#define OSTREAM_H_
 
 #include <stdarg.h>
 #include <stdint.h>
@@ -20,13 +22,13 @@
 #include <string.h>
 
 #include "ofMain.h"
-#include "ofxTCPClient.h"
 #include "stream.h"
 
 const uint64_t kGracePeriod = 500; // 0.5 second
 
 // Forward declaration.
 class ofApp;
+class ofxTCPClient;
 
 /**
  @brief Base class for output streams that forward ESP prediction results to
@@ -279,11 +281,7 @@ class TcpOStream : public OStreamVector {
         if (!s.empty()) sendString(s);
     }
 
-    bool start() {
-        has_started_ = client_.setup(server_, port_);
-        client_.setMessageDelimiter("\n");
-        return has_started_;
-    }
+	bool start();
 
 private:
     void sendString(const string& tosend);
@@ -295,7 +293,7 @@ private:
 
     string server_;
     int port_;
-    ofxTCPClient client_;
+    ofxTCPClient *client_;
 
     uint64_t elapsed_time_ = 0;
     std::map<uint32_t, string> tcp_stream_mapping_;
@@ -314,3 +312,5 @@ private:
  */
 void useOutputStream(OStream &stream);
 void useOutputStream(OStreamVector &stream);
+
+#endif
