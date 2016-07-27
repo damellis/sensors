@@ -1,5 +1,5 @@
 /**
- @file istream.h
+ @file InputStream.h
  @brief Definition of input streams: serial, audio, etc.
 
  These input streams provide sensor data to the machine learning pipeline.
@@ -25,13 +25,13 @@ const uint32_t kOfSoundStream_nBuffers = 4;
  @brief Base class for input streams that provide live sensor data to the ESP
  system.
 
- To use an IStream instance in your application, pass it to useInputStream()
+ To use an InputStream instance in your application, pass it to useInputStream()
  in your setup() function.
  */
-class IStream : public virtual Stream {
+class InputStream : public virtual Stream {
   public:
-    IStream();
-    virtual ~IStream() = default;
+    InputStream();
+    virtual ~InputStream() = default;
 
     /**
      Get the number of dimensions of the data that's provided by the
@@ -81,7 +81,7 @@ class IStream : public virtual Stream {
     const vector<string>& getLabels() const;
 
   protected:
-    vector<string> istream_labels_;
+    vector<string> InputStream_labels_;
     onDataReadyCallback data_ready_callback_;
     normalizeFunc normalizer_;
     vectorNormalizeFunc vectorNormalizer_;
@@ -92,7 +92,7 @@ class IStream : public virtual Stream {
 /**
  @brief Input stream for reading audio from the computer's microphone.
  */
-class AudioStream : public ofBaseApp, public IStream {
+class AudioStream : public ofBaseApp, public InputStream {
   public:
     AudioStream(uint32_t downsample_rate = 1);
     void audioIn(float *input, int buffer_size, int nChannel);
@@ -112,7 +112,7 @@ class AudioStream : public ofBaseApp, public IStream {
  spectrum as input to the current pipeline. The spectrum is supplied every
  ~23 milliseconds (i.e. 441000 KHz / 1024 = ~43 Hz).
  */
-class AudioFileStream : public IStream {
+class AudioFileStream : public InputStream {
   public:
     AudioFileStream(char *file, bool loop = false);
     virtual bool start() final;
@@ -125,7 +125,7 @@ class AudioFileStream : public IStream {
     unique_ptr<std::thread> update_thread_;
 };
 
-class BaseSerialStream : public IStream {
+class BaseSerialStream : public InputStream {
   public:
     BaseSerialStream(uint32_t usb_port_num, uint32_t baud, int numDimensions);
     virtual bool start() final;
@@ -147,7 +147,7 @@ class BaseSerialStream : public IStream {
     void readSerial();
 };
 
-class SerialStream : public IStream {
+class SerialStream : public InputStream {
   public:
     SerialStream(uint32_t usb_port_num, uint32_t baud);
     virtual bool start() final;
@@ -179,7 +179,7 @@ class BinaryIntArraySerialStream : public BaseSerialStream {
  To use an FirmataStream in your application, pass it to useInputStream() in
  your setup() function.
  */
-class FirmataStream : public IStream {
+class FirmataStream : public InputStream {
   public:
     /**
      Create a FirmataStream instance. Assumes the Arduino is communicating at
@@ -228,7 +228,7 @@ class FirmataStream : public IStream {
  @param stream: the input stream to use. May be an IOStream instance, in which
  case the stream will only be used for input.
  */
-void useInputStream(IStream &stream);
+void useInputStream(InputStream &stream);
 
 /**
  Tells the ESP system which machine learning pipeline to use. Call from your

@@ -6,6 +6,8 @@ int main() {
 
 #ifdef __APPLE__
     ofSetDataPathRoot("../Resources/data/");
+#elif _WIN32
+	ofSetDataPathRoot("data/");
 #else
     ofSetDataPathRoot(".");
 #endif

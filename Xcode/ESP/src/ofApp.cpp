@@ -8,6 +8,7 @@
 #include <string>
 
 #include "user.h"
+#include "ofxParagraph.h"
 
 // If the feature output dimension is larger than 32, making the visualization a
 // single output will be more visual.
@@ -95,7 +96,7 @@ void ofApp::useCalibrator(Calibrator &calibrator) {
     calibrator_ = &calibrator;
 }
 
-void ofApp::useIStream(IStream &stream) {
+void ofApp::useIStream(InputStream &stream) {
     if (!setup_finished_) istream_ = &stream;
 }
 
@@ -197,7 +198,7 @@ void ofApp::setup() {
 
     plot_class_likelihoods_.setup(kBufferSize_, kNumMaxLabels_, "Class Likelihoods");
     plot_class_likelihoods_.setDrawInfoText(true);
-    plot_class_likelihoods_.setColorPalette(color_palette.generate(kNumMaxLabels_));
+    // plot_class_likelihoods_.setColorPalette(color_palette.generate(kNumMaxLabels_));
     plot_class_likelihoods_.onValueHighlighted(this, &ofApp::onClassLikelihoodsPlotValueHighlight, NULL);
 
     plot_class_distances_.resize(kNumMaxLabels_);
@@ -221,7 +222,7 @@ void ofApp::setup() {
         plot.setup(kBufferSize_, dim, "PreProcessing Stage " + std::to_string(i));
         plot.setDrawGrid(true);
         plot.setDrawInfoText(true);
-        plot.setColorPalette(color_palette.generate(dim));
+        // plot.setColorPalette(color_palette.generate(dim));
         plot_pre_processed_.push_back(plot);
     }
 
@@ -239,7 +240,7 @@ void ofApp::setup() {
                 ofxGrtTimeseriesPlot plot;
                 plot.setup(kBufferSize_, 1, "Feature " + std::to_string(i));
                 plot.setDrawInfoText(true);
-                plot.setColorPalette(color_palette.generate(feature_dim));
+                // plot.setColorPalette(color_palette.generate(feature_dim));
                 feature_at_stage_i.push_back(plot);
             }
             // Each feature will be draw with a height of stage_height *
@@ -252,7 +253,7 @@ void ofApp::setup() {
             plot.setup(feature_dim, 1, "Feature");
             plot.setDrawGrid(true);
             plot.setDrawInfoText(true);
-            plot.setColorPalette(color_palette.generate(feature_dim));
+            // plot.setColorPalette(color_palette.generate(feature_dim));
             feature_at_stage_i.push_back(plot);
 
             // Since we will be drawing each feature in a separate plot, count them
