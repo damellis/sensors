@@ -13,6 +13,11 @@ matrix:
       env:
         - BUILD_TOOL=Xcode
         - OS=OSX
+    - os: osx
+      osx_image: xcode7.3
+      env:
+        - BUILD_TOOL=CMake
+        - OS=OSX
   exclude:
     - compiler: clang
 
