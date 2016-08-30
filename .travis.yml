@@ -80,3 +80,17 @@ script:
 cache:
   directories:
     - third-party/openFrameworks/libs
+before_deploy:
+  if [ "$OS" = "Linux" ]; then
+     (cd ../Xcode/ESP/ && doxygen Doxyfile)
+  fi;
+deploy:
+  provider: s3
+  access_key_id: AKIAIWOAZT5MLNUB2ZEA
+  secret_access_key:
+    secure: O2CMV7mv8mWEbHAE3pzmLLuTSikoStJaBmy5kn3Yqm9ugXThefhLgSKegxdyYuZ32Li2ES0Vrc/5x5pArW4yTa3/KXZn8/IHDexZsk95P1b1wUaaF1IwY5CQlttrmlnr6zQHCGKujk4Bwzy1SAgNo3ZKkeLJOpGZIDEWldB098WbhlscF3/9kRZS3dWfNRGh+6ja8s/sPQZUHMvaMLS8eAnNXIFq7ng5nZXSOxkf9gwDdj8Ff0+34VZDhS0usjGabzVvBb6enI+Dz5VVXqdBJRFccMUkynlVNRlT0hEFD0asg4UHKwNa8HvdoUiD2LBKxfIcvaRKkLuK57m4W32lCSOB1T15ynQgxTgEq71Z0c7mZ+WUO2x+O+UrqkqJ0Dopwdwla2dovbfyC3omdcDLA5SPVsS0wc9hxBLqEIbBb1og+TgLVhsx6UuDo+QIRs3pWwcZlBBEVLwZYw8yAXCRlLZO8pHNj4PBdEdOHKwwk5OGoJRt0c5ZuK0rxVRGxwANZuzoV7Erl2FV4ryVpQBzoa1v+MypCvZVxjhLQSTaoheos8iLG2SvulR710RVYUO59mDLEJr1wlL/anoipcZdsVX3caJFjKjtF543oPTU3oYQvAGTXI8ZV9NR/CCWJW8rMeKBb5XK/F3MF+WbtSA6gZwBPKiOn3ge8DhvjbTW6Yk=
+  bucket: esp-doc
+  local-dir: Xcode/ESP/doc/html
+  acl: public_read
+  on:
+    repo: damellis/ESP
