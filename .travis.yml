@@ -94,3 +94,4 @@ deploy:
   acl: public_read
   on:
     repo: damellis/ESP
+    branch: auto-doc
