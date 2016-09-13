@@ -512,7 +512,10 @@ void ofApp::setup() {
     GRT::ErrorLog::enableLogging(false);
     GRT::ErrorLog::registerObserver(*this);
 
-    loadAll(save_path_);
+    // If the save_path_ is set (e.g. in handleArgs), we load the session.
+    if (!save_path_.empty()) {
+        loadAll(save_path_);
+    }
 }  // End of ofApp::setup()
 
 void ofApp::onPlotRangeSelected(InteractivePlot::RangeSelectedCallbackArgs arg) {
