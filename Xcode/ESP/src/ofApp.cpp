@@ -1,5 +1,6 @@
 #include "ofApp.h"
 
+#include <Poco/Net/DNS.h>
 #include <algorithm>
 #include <cctype>
 #include <cmath>
@@ -153,6 +154,14 @@ ofApp::ofApp() : fragment_(TRAINING),
                  is_recording_(false) {
 }
 
+void ofApp::handleArgs(int argc, char* argv[]) {
+    // Right now the only argument we are taking is only the path which is
+    // argv[1]. It's directly assigned to save_path_ which will be loaded at the
+    // end of the setup.
+    assert(argc == 2);
+    save_path_ = argv[1];
+}
+
 //--------------------------------------------------------------
 void ofApp::setup() {
 #if __APPLE__ || __linux__
@@ -172,7 +181,7 @@ void ofApp::setup() {
     char const* appdata = getenv("APPDATA");
     if (appdata != NULL) {
         std::string appdata_str(appdata);
-        // Replace ~ with the home_str
+        // Replace %APPDATA with the home_str
         kLogDirectory.replace(0, 9, appdata_str);
     } else {
         // App-Data directory is not set, we clear the content of kLogDirectory
@@ -502,7 +511,9 @@ void ofApp::setup() {
     // Register myself as logging observer but disable first.
     GRT::ErrorLog::enableLogging(false);
     GRT::ErrorLog::registerObserver(*this);
-}
+
+    loadAll(save_path_);
+}  // End of ofApp::setup()
 
 void ofApp::onPlotRangeSelected(InteractivePlot::RangeSelectedCallbackArgs arg) {
     if (is_in_feature_view_) {
@@ -989,12 +1000,15 @@ bool ofApp::loadTuneables(const string& filename) {
 void ofApp::saveTuneables(ofxDatGuiButtonEvent e) { saveTuneablesWithPrompt(); }
 void ofApp::loadTuneables(ofxDatGuiButtonEvent e) { loadTuneablesWithPrompt(); }
 
-void ofApp::loadAll() {
+void ofApp::loadAllWithPrompt() {
     ofFileDialogResult result = ofSystemLoadDialog(
         "Load an exising ESP session", true);
     if (!result.bSuccess) { return; }
+    loadAll(result.getPath());
+}
 
-    save_path_ = result.getPath();
+void ofApp::loadAll(const string& path) {
+    save_path_ = path;
     const string dir = save_path_ + "/";
 
     // Need to load tuneable before pipeline because loading the tuneables
@@ -2238,7 +2252,7 @@ void ofApp::keyPressed(int key) {
     // Below are global key bindings that are enabled across any application
     // state.
     switch (key) {
-        case 'l': loadAll(); break;
+        case 'l': loadAllWithPrompt(); break;
         case 'L':
             if (fragment_ == CALIBRATION) loadCalibrationDataWithPrompt();
             else if (fragment_ == TRAINING) loadTrainingDataWithPrompt();

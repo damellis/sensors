@@ -55,6 +55,7 @@ class ofApp : public ofBaseApp, public GRT::Observer<GRT::ErrorLogMessage> {
         buffer_size_ = buffer_size;
     }
 
+    void handleArgs(int argc, char* argv[]);
   private:
     enum class AppState {
         kCalibration,
@@ -382,7 +383,8 @@ class ofApp : public ofBaseApp, public GRT::Observer<GRT::ErrorLogMessage> {
     string save_path_ = "";
 
     // Load all and save all
-    void loadAll();
+    void loadAllWithPrompt();
+    void loadAll(const string& path);
     void saveAll(bool saveAs = false);
 
     //========================================================================
