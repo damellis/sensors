@@ -5,18 +5,8 @@
 #include "ofAppNoWindow.h"
 #endif  // HEADLESS
 
-void usage() {
-// Platform-specific usage
-char message[] =
-#ifdef __APPLE__
-    "open -n ./ESP.app --args <ESP session directory>";
-#elif _WIN32
-    "No command line argument support for Windows yet";
-#else
-    "./ESP <ESP session directory>";
-#endif
-    std::cerr << message << std::endl;
-}
+// Instructions to run the program
+//   Linux  : ./ESP <ESP session directory>
 
 int main(int argc, char* argv[]) {
 
@@ -43,10 +33,7 @@ int main(int argc, char* argv[]) {
         // normal launch
     } else if (argc == 2) {
         ESP->handleArgs(argc, argv);
-    } else {
-        // wrong number of arguments
-        usage();
-        return -1;
     }
+
     ofRunApp(ESP);
 }
