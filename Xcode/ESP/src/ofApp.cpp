@@ -8,6 +8,7 @@
 #include <sstream>
 #include <string>
 
+#include "ESP.h"
 #include "user.h"
 #include "ofxParagraph.h"
 #include "ofYesNoDialog.h"
@@ -452,6 +453,8 @@ void ofApp::setup() {
 
     training_data_manager_.setNumDimensions(istream_->getNumOutputDimensions());
 
+#ifndef HEADLESS
+    // Only setup gui panel if NOT headless mode
     gui_.addHeader(":: Configuration ::");
     gui_.setAutoDraw(false);
     gui_.setPosition(ofGetWidth() - 300, 0);
@@ -505,6 +508,7 @@ void ofApp::setup() {
     } else {
         gui_.collapse();
     }
+#endif
 
     ofBackground(54, 54, 54);
 
@@ -1547,6 +1551,11 @@ void ofApp::enableTrainingSampleGUI(bool should_enable) {
 
 //--------------------------------------------------------------
 void ofApp::draw() {
+#ifdef HEADLESS
+    // If in headless mode, we simply return (do not draw anything)
+    return;
+#endif
+
     // Hacky panel on the top.
     const uint32_t left_margin = 10;
     const uint32_t top_margin = 20;

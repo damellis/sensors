@@ -39,6 +39,8 @@
 
 #pragma once
 
+#define HEADLESS
+
 #include "GRT/GRT.h"
 #include "calibrator.h"
 #include "iostream.h"
