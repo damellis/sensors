@@ -453,6 +453,7 @@ void ofApp::setup() {
 
     training_data_manager_.setNumDimensions(istream_->getNumOutputDimensions());
 
+    bool is_input_streaming = istream_->start();
 #ifndef HEADLESS
     // Only setup gui panel if NOT headless mode
     gui_.addHeader(":: Configuration ::");
@@ -464,7 +465,7 @@ void ofApp::setup() {
     // Start input streaming.
     // If failed, this could be due to serial stream's port configuration.
     // We prompt to ask for the port.
-    if (!istream_->start()) {
+    if (!is_input_streaming) {
         if (BaseSerialInputStream* ss = dynamic_cast<BaseSerialInputStream*>(istream_)) {
             vector<string> serials = ss->getSerialDeviceList();
             serial_selection_dropdown_ =

@@ -14,6 +14,7 @@
 
 #include <string>
 
+#include "ESP.h"
 #include "ofxDatGui.h"
 
 using std::string;
@@ -117,19 +118,25 @@ class Tuneable {
         if (word == "INT") {
             int* p = static_cast<int*>(value_ptr_);
             iss >> *p;
+#ifndef HEADLESS
             ofxDatGuiSlider *slider = static_cast<ofxDatGuiSlider*>(ui_ptr_);
             slider->setValue(*p);
+#endif
         } else if (word == "DOUBLE") {
             double* p = static_cast<double*>(value_ptr_);
             iss >> *p;
+#ifndef HEADLESS
             ofxDatGuiSlider *slider = static_cast<ofxDatGuiSlider*>(ui_ptr_);
             slider->setValue(*p);
+#endif
         } else if (word == "BOOL") {
             bool* p = static_cast<bool*>(value_ptr_);
             iss >> word;
             *p = (word == "true") ? true : false;
+#ifndef HEADLESS
             ofxDatGuiToggle *toggle = static_cast<ofxDatGuiToggle*>(ui_ptr_);
             toggle->setEnabled(*p);
+#endif
         }
 
         return false;
