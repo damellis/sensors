@@ -4,6 +4,15 @@ project(${PROJECT})
 cmake_minimum_required(VERSION 3.0)
 
 # =============================================================
+#   Build options
+# =============================================================
+option(BUILD_HEADLESS "Build a headless version" OFF)
+
+if(BUILD_HEADLESS)
+  add_definitions(-DHEADLESS)
+endif()
+
+# =============================================================
 #   openFrameworks
 # =============================================================
 set(OF_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third-party/openFrameworks)

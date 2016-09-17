@@ -1,5 +1,6 @@
 #include "ofApp.h"
 
+#include <Poco/Net/DNS.h>
 #include <algorithm>
 #include <cctype>
 #include <cmath>
@@ -7,6 +8,7 @@
 #include <sstream>
 #include <string>
 
+#include "ESP.h"
 #include "user.h"
 #include "ofxParagraph.h"
 #include "ofYesNoDialog.h"
@@ -155,6 +157,14 @@ ofApp::ofApp() : fragment_(TRAINING),
                  false_negative_threshold_(0) {
 }
 
+void ofApp::handleArgs(int argc, char* argv[]) {
+    // Right now the only argument we are taking is only the path which is
+    // argv[1]. It's directly assigned to save_path_ which will be loaded at the
+    // end of the setup.
+    assert(argc == 2);
+    save_path_ = argv[1];
+}
+
 //--------------------------------------------------------------
 void ofApp::setup() {
 #if __APPLE__ || __linux__
@@ -174,7 +184,7 @@ void ofApp::setup() {
     char const* appdata = getenv("APPDATA");
     if (appdata != NULL) {
         std::string appdata_str(appdata);
-        // Replace ~ with the home_str
+        // Replace %APPDATA with the home_str
         kLogDirectory.replace(0, 9, appdata_str);
     } else {
         // App-Data directory is not set, we clear the content of kLogDirectory
@@ -445,6 +455,9 @@ void ofApp::setup() {
 
     training_data_manager_.setNumDimensions(istream_->getNumOutputDimensions());
 
+    bool is_input_streaming = istream_->start();
+#ifndef HEADLESS
+    // Only setup gui panel if NOT headless mode
     gui_.addHeader(":: Configuration ::");
     gui_.setAutoDraw(false);
     gui_.setPosition(ofGetWidth() - 300, 0);
@@ -454,7 +467,7 @@ void ofApp::setup() {
     // Start input streaming.
     // If failed, this could be due to serial stream's port configuration.
     // We prompt to ask for the port.
-    if (!istream_->start()) {
+    if (!is_input_streaming) {
         if (BaseSerialInputStream* ss = dynamic_cast<BaseSerialInputStream*>(istream_)) {
             vector<string> serials = ss->getSerialDeviceList();
             serial_selection_dropdown_ =
@@ -498,13 +511,19 @@ void ofApp::setup() {
     } else {
         gui_.collapse();
     }
+#endif
 
     ofBackground(54, 54, 54);
 
     // Register myself as logging observer but disable first.
     GRT::ErrorLog::enableLogging(false);
     GRT::ErrorLog::registerObserver(*this);
-}
+
+    // If the save_path_ is set (e.g. in handleArgs), we load the session.
+    if (!save_path_.empty()) {
+        loadAll(save_path_);
+    }
+}  // End of ofApp::setup()
 
 void ofApp::onPlotRangeSelected(InteractivePlot::RangeSelectedCallbackArgs arg) {
     if (is_in_feature_view_) {
@@ -991,12 +1010,15 @@ bool ofApp::loadTuneables(const string& filename) {
 void ofApp::saveTuneables(ofxDatGuiButtonEvent e) { saveTuneablesWithPrompt(); }
 void ofApp::loadTuneables(ofxDatGuiButtonEvent e) { loadTuneablesWithPrompt(); }
 
-void ofApp::loadAll() {
+void ofApp::loadAllWithPrompt() {
     ofFileDialogResult result = ofSystemLoadDialog(
         "Load an exising ESP session", true);
     if (!result.bSuccess) { return; }
+    loadAll(result.getPath());
+}
 
-    save_path_ = result.getPath();
+void ofApp::loadAll(const string& path) {
+    save_path_ = path;
     const string dir = save_path_ + "/";
 
     // Need to load tuneable before pipeline because loading the tuneables
@@ -1532,6 +1554,11 @@ void ofApp::enableTrainingSampleGUI(bool should_enable) {
 
 //--------------------------------------------------------------
 void ofApp::draw() {
+#ifdef HEADLESS
+    // If in headless mode, we simply return (do not draw anything)
+    return;
+#endif
+
     // Hacky panel on the top.
     const uint32_t left_margin = 10;
     const uint32_t top_margin = 20;
@@ -2260,7 +2287,7 @@ void ofApp::keyPressed(int key) {
     // Below are global key bindings that are enabled across any application
     // state.
     switch (key) {
-        case 'l': loadAll(); break;
+        case 'l': loadAllWithPrompt(); break;
         case 'L':
             if (fragment_ == CALIBRATION) loadCalibrationDataWithPrompt();
             else if (fragment_ == TRAINING) loadTrainingDataWithPrompt();
