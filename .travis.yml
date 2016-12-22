@@ -21,8 +21,7 @@ branches:
   only:
     - master
 
-compiler:
-  - clang
+compiler: clang
 
 before_script:
   # Take care of dependencies.
